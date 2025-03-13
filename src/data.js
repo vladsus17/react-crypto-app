@@ -303,7 +303,7 @@ export const cryptoData = {
       name: 'Dogecoin',
       symbol: 'DOGE',
       rank: 11,
-      price: 0.0785992655070039,
+      price: 0.16,
       priceBtc: 0.0000017518571947513752,
       volume: 507579314.8695062,
       marketCap: 11205796392.058752,
@@ -499,9 +499,7 @@ export const cryptoData = {
       twitterUrl: 'https://twitter.com/dfinity',
       contractAddress: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
       decimals: 18,
-      explorers: [
-        'https://dashboard.internetcomputer.org/canister/ryjl3-tyaaa-aaaaa-aaaba-cai',
-      ],
+      explorers: ['https://dashboard.internetcomputer.org/canister/ryjl3-tyaaa-aaaaa-aaaba-cai'],
     },
     {
       id: 'shiba-inu',
@@ -607,7 +605,7 @@ export const cryptoData = {
     hasPreviousPage: false,
     hasNextPage: true,
   },
-}
+};
 
 export const cryptoAssets = [
   {
@@ -622,4 +620,10 @@ export const cryptoAssets = [
     price: 2400,
     date: new Date(),
   },
-]
+  {
+    id: 'dogecoin',
+    amount: 10000,
+    price: 0.12,
+    date: new Date(),
+  },
+];

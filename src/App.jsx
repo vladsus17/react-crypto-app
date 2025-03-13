@@ -1,19 +1,12 @@
-import React, { useEffect } from 'react';
-import { Layout } from 'antd';
-
-import AppHeader from './components/AppHeader';
-import AppSider from './components/AppSider';
-import AppContent from './components/AppContent';
+import React from 'react';
+import AppLoyout from './components/AppLoyaut';
+import { CryptoContextProvider } from './context/crypto-context';
 
 const App = () => {
   return (
-    <Layout>
-      <AppHeader />
-      <Layout>
-        <AppSider />
-        <AppContent />
-      </Layout>
-    </Layout>
+    <CryptoContextProvider>
+      <AppLoyout />
+    </CryptoContextProvider>
   );
 };
 

@@ -1,60 +1,22 @@
-import { Layout, Card, Statistic, List, Typography, Spin } from 'antd';
+import { Layout, Card, Statistic, List, Typography, Spin, Tag } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import React from 'react';
-import { fakeFetchAssets, fakeFetchCrypto } from '../api';
-import { percentDif } from '../utils';
+import { capitalize } from '../utils';
+import CryptoContext from '../context/crypto-context';
 
 const siderStyle = {
   padding: '1rem',
 };
 
-const data = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.',
-];
-
 function AppSider() {
-  const [loading, setLoading] = React.useState(false);
-  const [crypto, setCrypto] = React.useState([]);
-  const [assets, setAssets] = React.useState([]);
-
-  React.useEffect(() => {
-    async function preload() {
-      setLoading(true);
-      const { result } = await fakeFetchCrypto();
-      const assets = await fakeFetchAssets();
-
-      setAssets(
-        assets.map((asset) => {
-          const coin = result.find((c) => c.id === asset.id);
-          return {
-            grow: asset.price < coin.price,
-            growPorcent: percentDif(asset.price, coin.price),
-            totalAmount: asset.amount * coin.price,
-            totalProfit: asset.amount * coin.price - asset.amount * asset.price,
-            ...asset,
-          };
-        }),
-      );
-      setCrypto(result);
-      setLoading(false);
-    }
-    preload();
-  }, []);
-
-  if (loading) {
-    return <Spin fullscreen />;
-  }
+  const { assets } = React.useContext(CryptoContext);
 
   return (
     <Layout.Sider width="25%" style={siderStyle}>
       {assets.map((asset) => (
         <Card key={asset.id} style={{ marginBottom: '1rem' }}>
           <Statistic
-            title={asset.id}
+            title={capitalize(asset.id)}
             value={asset.totalAmount}
             precision={2}
             valueStyle={{
@@ -65,10 +27,25 @@ function AppSider() {
           />
           <List
             size="small"
-            dataSource={data}
+            dataSource={[
+              { title: 'Total Profit', value: asset.totalProfit, isTag: true },
+              { title: 'Asset Amount', value: asset.amount, isPlain: true },
+              //{ title: 'Difference', value: asset.growPorcent },
+            ]}
             renderItem={(item) => (
-              <List.Item>
-                <Typography.Text mark>[ITEM]</Typography.Text> {item}
+              <List.Item style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>{item.title}</span>
+                <span>
+                  {item.isTag && (
+                    <Tag color={asset.grow ? 'green' : 'red'}>{asset.growPorcent}%</Tag>
+                  )}
+                  {item.isPlain && item.value}
+                  {!item.isPlain && (
+                    <Typography.Text type={asset.grow ? 'success' : 'danger'}>
+                      {item.value.toFixed(2)}$
+                    </Typography.Text>
+                  )}
+                </span>
               </List.Item>
             )}
           />
