@@ -9,19 +9,76 @@ import {
   Button,
   InputNumber,
   DatePicker,
+  Result,
 } from 'antd';
 import CryptoContext from '../context/crypto-context';
 
-function AddAssetForm() {
+const validateMessages = {
+  required: '${label} is rqeuired!',
+  types: {
+    number: '${label} is not valid number',
+  },
+  number: {
+    range: '${label} must be between ${min} and ${max}',
+  },
+};
+
+function AddAssetForm({ onClose }) {
+  const [form] = Form.useForm();
   const [coin, setCoin] = React.useState(null);
-  const { crypto } = React.useContext(CryptoContext);
+  const { crypto, addAsset } = React.useContext(CryptoContext);
+  const [submitted, setSubmitted] = React.useState(false);
+  const assetRef = React.useRef();
 
   const onFinish = (values) => {
-    console.log('Success:', values);
+    const newAsset = {
+      id: coin.id,
+      amount: values.amount,
+      price: values.price,
+      date: values.date?.$d ?? new Date(),
+    };
+    assetRef.current = newAsset;
+    setSubmitted(true);
+    addAsset(newAsset);
   };
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
+  const handleAmountChange = (value) => {
+    if (!value || isNaN(value)) {
+      form.setFieldsValue({ total: 0 });
+      return;
+    }
+
+    const total = (value * (coin?.price || 0)).toFixed(2);
+
+    form.setFieldsValue({
+      total: Number(total),
+    });
+  };
+
+  const handlePriceChange = (value) => {
+    const amount = form.getFieldValue('amount');
+    form.setFieldsValue({
+      total: +(amount * value).toFixed(2),
+    });
+  };
+
+  if (submitted) {
+    return (
+      <Result
+        status="success"
+        title="New Asset Added"
+        subTitle={`Added ${assetRef.current.amount} of ${coin.name} by price ${assetRef.current.price}`}
+        extra={[
+          <Button type="primary" key="console" onClick={onClose}>
+            Go Console
+          </Button>,
+        ]}
+      />
+    );
+  }
 
   return (
     <div>
@@ -50,6 +107,7 @@ function AddAssetForm() {
         />
       ) : (
         <Form
+          form={form}
           name="basic"
           labelCol={{
             span: 4,
@@ -61,9 +119,10 @@ function AddAssetForm() {
             maxWidth: 600,
           }}
           initialValues={{
-            remember: true,
+            price: +coin.price.toFixed(4),
           }}
           onFinish={onFinish}
+          validateMessages={validateMessages}
           onFinishFailed={onFinishFailed}
           autoComplete="off">
           <Flex align="center">
@@ -82,14 +141,17 @@ function AddAssetForm() {
                 required: true,
                 type: 'number',
                 min: 0,
-                message: 'Please input your username!',
               },
             ]}>
-            <InputNumber style={{ width: '100%' }} />
+            <InputNumber
+              placeholder="Enter coin amount"
+              onChange={handleAmountChange}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item label="Price" name="price">
-            <InputNumber disabled style={{ width: '100%' }} />
+            <InputNumber onChange={handlePriceChange} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item label="Date & Hour" name="Date & Hour">
