@@ -2,6 +2,7 @@ import { createContext } from 'react';
 import React from 'react';
 import { fakeFetchAssets, fakeFetchCrypto } from '../api';
 import { percentDif } from '../utils';
+import AssetsTable from '../components/AssetsTable';
 
 const CryptoContext = createContext({
   assets: [],
@@ -22,6 +23,7 @@ export function CryptoContextProvider({ children }) {
         growPorcent: percentDif(asset.price, coin.price),
         totalAmount: asset.amount * coin.price,
         totalProfit: asset.amount * coin.price - asset.amount * asset.price,
+        name: coin.name,
         ...asset,
       };
     });
